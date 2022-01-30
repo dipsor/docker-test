@@ -1,0 +1,43 @@
+version: '3'
+services:
+    webserver:
+        image: nginx:alpine
+        volumes:
+            - .:/var/www:delegated
+            ## copy nginx configuration for our application ##
+            - ./tools/docker/nginx/conf.d/:/etc/nginx/conf.d/
+        ports:
+            ## run the webserver on port 80 ##
+            - "80:80"
+    app:
+        ## read php image from our custom docker image ##
+        build:
+            context: .
+            dockerfile: tools/docker/php/Dockerfile
+        volumes:
+            ## copy project files to /var/www ##
+            - .:/var/www:delegated
+        working_dir: /var/www
+
+    mariadb:
+        image: 'mariadb:10.7'
+        ## expose the mysql port to our machine so we can access it from any mysql-client like TablePlus ##
+        ports:
+            - "4306:3306"
+        ## keep mysql data on localhost so we don't lose them ##
+        volumes:
+            - ./tools/docker-volumes-data/db:/var/lib/database
+        environment:
+            MYSQL_DATABASE: fun-house
+            MYSQL_USER: root
+            MYSQL_PASSWORD: root
+            MYSQL_ROOT_PASSWORD: root
+
+    redis:
+        image: redis
+        volumes:
+            ## keep redis data on localhost so we don't lose them ##
+            - ./tools/docker-volumes-data/redis:/data
+volumes:
+    maria-data:
+        driver: local
