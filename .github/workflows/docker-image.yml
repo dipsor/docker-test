@@ -23,4 +23,4 @@ jobs:
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag dipsor/php:1.0
     - name: Docker Push
-      run: docker push ${{secrets.DOCKER_USER}}/php
+      run: docker push ${{secrets.DOCKER_USER}}/php:1.0
